@@ -20,7 +20,7 @@ ul {
     list-style-type: none;
     width: 100%;
     height: 100%;
-    overflow: auto;
+    overflow: hidden;
 }
   
 li {
@@ -109,10 +109,12 @@ button:focus.send {
     border: 1px solid yellow;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 div.chatDisplayBox {
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     width: 100%;
     height: 94vh;
     border: 1px solid red;

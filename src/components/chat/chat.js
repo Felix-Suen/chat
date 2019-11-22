@@ -2,6 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import './chat.css';
 import Popup from './popup';
+import { baseurl } from '../../url';
+const axios = require('axios');
 
 class Chat extends React.Component {
   constructor(props) {
@@ -13,7 +15,25 @@ class Chat extends React.Component {
     }
   }
 
+    handleLoadMessages = () => {
+        axios.get(`${baseurl}/read`)
+            .then((res) => {
+                this.setState({
+                    list: res.data
+                }, () => {
+                    console.log(this.state.list)
+                })
+            })
+    }
+
+
+    componentDidMount() {
+        this.handleLoadMessages()
+    }
+
   handleLogout = () => {
+    localStorage.removeItem('username');
+    localStorage.removeItem('password');
     this.props.rename('');
     this.props.changelog(false);
     this.props.history.push('/login');
@@ -38,11 +58,18 @@ class Chat extends React.Component {
     }
 
     handleAdd = () => {
-        this.setState({
-            'list': [...this.state.list, this.state.text],
-            'text': ''
+        axios.post(`${baseurl}/add`, {
+            'sender': this.props.user,
+            'message': this.state.text,
+            'time': Date.now()
         })
-        console.log(this.state.list)
+            .then((res) => {
+                console.log(res.data)
+                this.setState({
+                    'list': res.data,
+                    'text': ''
+                })
+        })
     }
 
   render() {
@@ -68,7 +95,7 @@ class Chat extends React.Component {
                       return (
                         <div key={index} className="textDisplayBox">
                             <div className="text">
-                                <p>{item}</p>
+                                <p>{item.sender}: {item.message}</p>
                             </div>
                         </div>
                       )

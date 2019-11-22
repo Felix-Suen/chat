@@ -3,6 +3,7 @@
 # private info 
 /src/url.js
 /server/user_data.js
+/server/messages.json
 
 # dependencies
 /node_modules

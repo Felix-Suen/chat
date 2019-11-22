@@ -1,6 +1,6 @@
 import React from 'react';
 import './login.css';
-import { authurl } from '../url';
+import { baseurl } from '../url';
 import { connect } from 'react-redux';
 
 const axios = require('axios');
@@ -21,21 +21,40 @@ class Login extends React.Component {
             [e.target.name]: e.target.value
         });
     }
+        
+    componentDidMount() {
+        const username = localStorage.getItem('username');
+        const password = localStorage.getItem('password');
+        if (username && password) {
+            this.setState({
+                username: username,
+                password: password
+            }, () => {
+                this.handleSuccess()
+            })
+        }
+    }
 
-    handleSubmit = (e) => {
+    handleSuccess = (e) => {
+        localStorage.setItem('username', this.state.username);
+        localStorage.setItem('password', this.state.password);
+        this.props.rename(this.state.username);
+        this.props.changelog(true);
+        this.props.history.push('/');
+    }
+
+    handleLogin = (e) => {
         e.preventDefault()
         const username = this.state.username;
         const password = this.state.password;
-        axios.post(authurl, {
+        axios.post(`${baseurl}/auth`, {
             username: username,
             password: password
         })
         .then((res) => {
             console.log(res.data);
             if (res.data) {
-                this.props.rename(this.state.username);
-                this.props.changelog(true);
-                this.props.history.push('/');
+                this.handleSuccess();
             } else {
                 this.setState({
                     error: "FAILED TO AUTHENTICATE"
@@ -47,7 +66,7 @@ class Login extends React.Component {
         })
         .catch((err) => {
             this.setState({
-                error: "Wrong boi"
+                error: "AUTHENTICATION ERROR"
             })
         })
     }
@@ -56,7 +75,7 @@ class Login extends React.Component {
         return(
             <div className="form">
                 <h1>Gotta Go Faster</h1>
-                <form onSubmit={this.handleSubmit}>
+                <form onSubmit={this.handleLogin}>
                     <div className="container">
                         <label>
                             <input 
